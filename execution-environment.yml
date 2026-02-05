@@ -1,23 +1,43 @@
 ---
-# Ansible Execution Environment Definition
-# This can be used to build a custom AWX execution environment with all dependencies pre-installed
+# Ansible Execution Environment Definition for PAN-OS Policy Automation
+# This builds a custom AWX/AAP execution environment with all required dependencies
 #
-# Build with: ansible-builder build -t my-panos-ee:latest
+# Prerequisites:
+#   1. Install ansible-builder: pip install ansible-builder
+#   2. Install podman or docker
+#
+# Build command:
+#   ansible-builder build -t quay.io/your-username/panos-policy-ee:1.0.0 -v 3
+#
+# Push to registry:
+#   podman push quay.io/your-username/panos-policy-ee:1.0.0
+#
+# Then in AWX:
+#   1. Go to Execution Environments
+#   2. Add new Execution Environment
+#   3. Name: PAN-OS Policy EE
+#   4. Image: quay.io/your-username/panos-policy-ee:1.0.0
+#   5. Pull: Always (or on first use)
+#   6. Update your Job Template to use this EE
 
 version: 3
 
 images:
   base_image:
-    name: quay.io/ansible/creator-ee:latest
+    name: quay.io/ansible/ansible-runner:latest
 
 dependencies:
   galaxy: collections/requirements.yml
   python: requirements.txt
   system: |
-    git
-    python3-devel
-    gcc
+    git [platform:rpm]
+    python3-devel [platform:rpm]
+    gcc [platform:rpm]
+    libxml2-devel [platform:rpm]
+    libxslt-devel [platform:rpm]
 
 additional_build_steps:
-  append_final:
+  prepend_base:
     - RUN pip3 install --upgrade pip setuptools wheel
+  append_final:
+    - RUN pip3 list | grep -E "pan-|pandevice" || echo "WARNING: PAN-OS libraries not installed"
