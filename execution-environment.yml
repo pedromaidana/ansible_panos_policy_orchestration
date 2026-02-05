@@ -1,0 +1,23 @@
+---
+# Ansible Execution Environment Definition
+# This can be used to build a custom AWX execution environment with all dependencies pre-installed
+#
+# Build with: ansible-builder build -t my-panos-ee:latest
+
+version: 3
+
+images:
+  base_image:
+    name: quay.io/ansible/creator-ee:latest
+
+dependencies:
+  galaxy: collections/requirements.yml
+  python: requirements.txt
+  system: |
+    git
+    python3-devel
+    gcc
+
+additional_build_steps:
+  append_final:
+    - RUN pip3 install --upgrade pip setuptools wheel

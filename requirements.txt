@@ -1,0 +1,13 @@
+# Python Requirements for AWX Execution Environment
+#
+# AWX will install these Python packages when the project is synced
+# if configured properly in the Job Template.
+#
+# Required by paloaltonetworks.panos collection:
+pan-python>=0.17.0
+pandevice>=1.8.0
+pan-os-python>=1.7.3
+
+# Network/XML libraries (dependencies):
+xmltodict>=0.12.0
+requests>=2.25.0
