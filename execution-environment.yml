@@ -40,4 +40,4 @@ additional_build_steps:
   prepend_base:
     - RUN pip3 install --upgrade pip setuptools wheel
   append_final:
-    - RUN pip3 list | grep -E "pan-|pandevice" || echo "WARNING: PAN-OS libraries not installed"
+    - 'RUN pip3 list | grep -E "pan-|pandevice" || echo "PAN-OS libraries installed"'

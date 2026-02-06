@@ -1,0 +1,33 @@
+# Git files
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+!requirements.txt
+docs/
+
+# Build artifacts
+context/
+*.tar.gz
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Ansible
+*.retry
+collections/ansible_collections/
+
+# Misc
+.DS_Store
