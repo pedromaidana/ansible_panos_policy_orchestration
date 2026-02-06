@@ -1,0 +1,73 @@
+---
+- name: List Execution Environment Libraries and Collections
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  tasks:
+    - name: Display Python version
+      ansible.builtin.command: python3 --version
+      register: python_version
+      changed_when: false
+
+    - name: Show Python version
+      ansible.builtin.debug:
+        msg: "{{ python_version.stdout }}"
+
+    - name: List installed Python packages
+      ansible.builtin.command: pip3 list
+      register: pip_packages
+      changed_when: false
+
+    - name: Display Python packages
+      ansible.builtin.debug:
+        msg: "{{ pip_packages.stdout_lines }}"
+
+    - name: Check for PAN-OS specific libraries
+      ansible.builtin.command: pip3 list | grep -i pan
+      register: pan_packages
+      changed_when: false
+      failed_when: false
+
+    - name: Display PAN-OS Python libraries
+      ansible.builtin.debug:
+        msg: "{{ pan_packages.stdout_lines if pan_packages.stdout_lines | length > 0 else ['No PAN-OS libraries found'] }}"
+
+    - name: List installed Ansible collections
+      ansible.builtin.command: ansible-galaxy collection list
+      register: ansible_collections
+      changed_when: false
+
+    - name: Display Ansible collections
+      ansible.builtin.debug:
+        msg: "{{ ansible_collections.stdout_lines }}"
+
+    - name: Verify pan-python import
+      ansible.builtin.command: python3 -c "import pan.xapi; print('✓ pan-python is working')"
+      register: pan_python_test
+      changed_when: false
+      failed_when: false
+
+    - name: Verify pandevice import
+      ansible.builtin.command: python3 -c "import pandevice; print('✓ pandevice is working')"
+      register: pandevice_test
+      changed_when: false
+      failed_when: false
+
+    - name: Display verification results
+      ansible.builtin.debug:
+        msg:
+          - "pan-python: {{ pan_python_test.stdout if pan_python_test.rc == 0 else '✗ NOT installed or import failed' }}"
+          - "pandevice: {{ pandevice_test.stdout if pandevice_test.rc == 0 else '✗ NOT installed or import failed' }}"
+
+    - name: Summary
+      ansible.builtin.debug:
+        msg:
+          - "=========================================="
+          - "Execution Environment Verification"
+          - "=========================================="
+          - "Python: {{ python_version.stdout }}"
+          - "Total packages: {{ pip_packages.stdout_lines | length }}"
+          - "pan-python status: {{ 'OK' if pan_python_test.rc == 0 else 'MISSING' }}"
+          - "pandevice status: {{ 'OK' if pandevice_test.rc == 0 else 'MISSING' }}"
+          - "=========================================="
